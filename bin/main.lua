@@ -4,6 +4,7 @@ end
 
 function love.update(dt)
 
+
 end
 
 function love.draw()
@@ -12,6 +13,7 @@ function love.draw()
 
 end
 
-function love.keypressed()
+function love.keypressed(key)
+	if key == "escape" then love.event.quit() end
 
 end
