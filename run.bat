@@ -1,0 +1,1 @@
+start C:\Love2d\0.10.0\love.exe .\bin

@@ -1,7 +1,7 @@
 function love.conf(t)
     -- основные настройки
-    t.title = "MyGame"          -- заголовок окна и название игры
-    t.author = "Author"         -- автор игры
+    t.title = "Game"          -- заголовок окна и название игры
+    t.author = "Praron"         -- автор игры
     t.identity = "data"       -- папка, куда игра сможет писать
     t.version = "0.10.0"     -- версия фреймворка
     t.console = false           -- консоль (исп-ся только для Windows-сборки)
