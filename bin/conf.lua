@@ -26,4 +26,5 @@ function love.conf(t)
     t.modules.event = true      -- создание и обработка событий
     t.modules.timer = true      -- таймер (иначе love.update не будет работать)
     t.modules.physics = true        -- встроенная физика Box2D
+    io.stdout:setvbuf("no")     -- чтобы работала консоль в Sublime Text
 end

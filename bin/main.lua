@@ -1,15 +1,25 @@
+
+
+
+local lurker = require("libs.lurker")
+
 function love.load()
 
 end
 
 function love.update(dt)
+	lurker.update()
 
 
 end
 
+lg = love.graphics
 function love.draw()
-	love.graphics.setColor(0, 100, 100)
-	love.graphics.rectangle("fill", 100, 100, 100, 100)
+	lg.setBackgroundColor(0, 100, 100, 100)
+	lg.circle("fill", 200, 200, 100)
+	lg.setColor(200, 255, 255)
+	lg.rectangle("fill", 100, 100, 100, 100)
+
 
 end
 
