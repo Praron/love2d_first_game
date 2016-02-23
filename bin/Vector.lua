@@ -15,7 +15,6 @@ end
 
 function Vector:addY(y, dt)
 	self.y = self.y + y * (dt or 1)
-	-- self.y = self.y
 	return self
 end
 

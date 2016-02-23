@@ -16,6 +16,9 @@ Actor.vSpeed = Vector()
 Actor.vAcc = Vector()
 Actor.shape = nil
 
+function Actor:setShape(shape) self.shape = shape; return self end
+function Actor:getShape() return self.shape end
+
 
 
 function Actor:initialize(x, y, speed, acc, braking)
@@ -26,6 +29,7 @@ function Actor:initialize(x, y, speed, acc, braking)
 	braking = braking or 0
 	vSpeed = Vector:new()
 	vAcc = Vector:new()
+
 end
 
 
@@ -38,6 +42,7 @@ end
 
 function Actor:update(dt)
 	self:move(dt)
+	self.shape:moveTo(self.vPos:get())
 end
 
 

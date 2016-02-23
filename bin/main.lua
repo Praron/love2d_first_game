@@ -1,28 +1,37 @@
+-- local lurker = require("libs.lurker")
+local class = require("libs.middleclass")
+local hc = require("libs.hc")
 
 require("Player")
 require("Vector")
 
-
--- local lurker = require("libs.lurker")
-local class = require("libs.middleclass")
--- local scene = require("libs.hc.spatialhash")
-
 local lk = love.keyboard
 local lg = love.graphics
 
+local scene = hc.new(150)
 local player
+
+function scene:add(actor)
+	scene:register(actor:getShape())
+end
 
 function love.load()
 	player = Player:new()
+	-- player:setShape(scene:circle(10, 10, 50))
+	scene:add(player)
+
+
 
 
 
 
 end
 
+
 function love.update(dt)
 	-- lurker.update()
 	player:update(dt)
+	-- print(player:getShape():center())
 	
 
 

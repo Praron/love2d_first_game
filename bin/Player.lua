@@ -1,13 +1,14 @@
 require("Vector")
-local class = require("libs.middleclass")
 require("Actor")
+local class = require("libs.middleclass")
+local shapes = require("libs.hc.shapes")
 
 Player = class("Player", Actor)
 
 local lk = love.keyboard
 local lm = love.mouse
 local lg = love.graphics
-	
+
 
 local RADIUS = 20
 
@@ -37,11 +38,12 @@ end
 function Player:initialize(x, y)
 	Actor.initialize(self, x, y, maxSpeed, acc, braking)
 
-
 	firstLaserAngle = 0.01  -- that's weird but lasers are not rotating by keyboard if = 0
 	secondLaserAngle = firstLaserAngle - math.pi
 	controlMode = "mouse"
 	laserMode = "direct"
+
+	self.shape = shapes.newCircleShape(10, 15, 20)
 
 	bounds = {x = 0, y = 0, w = love.graphics.getWidth(), h = love.graphics.getHeight()}
 end
