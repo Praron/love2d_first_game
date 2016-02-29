@@ -454,6 +454,10 @@ local function newPointShape(...)
 	return common_local.instance(PointShape, ...)
 end
 
+local function newRectangleShape(x, y, w, h)
+	return newPolygonShape(x,y, x+w,y, x+w,y+h, x,y+h)
+end
+
 return {
 	ConcavePolygonShape = ConcavePolygonShape,
 	ConvexPolygonShape  = ConvexPolygonShape,
@@ -462,5 +466,6 @@ return {
 	newPolygonShape     = newPolygonShape,
 	newCircleShape      = newCircleShape,
 	newPointShape       = newPointShape,
+	newRectangleShape   = newRectangleShape
 }
 

@@ -1,6 +1,6 @@
-require("Vector")
-require("Actor")
-local class = require("libs.middleclass")
+-- require("Vector")
+-- require("Actor")
+-- local class = require("libs.middleclass")
 local shapes = require("libs.hc.shapes")
 
 Player = class("Player", Actor)
@@ -12,9 +12,9 @@ local lg = love.graphics
 
 local RADIUS = 20
 
-local LASER_SPEED = 5
-local LASER_LENGTH = 1000
-local KEYBOARD_ROTATE_SPEED = 5
+local LASER_SPEED = 2
+Player.static.LASER_LENGTH = 1000
+Player.static.LASER_WIDTH = 20
 
 local bounds
 
@@ -24,26 +24,35 @@ local laserMode
 
 local controlMode
 
-local maxSpeed = 400
-local acc = 500
-local braking = 5
+function Player:initDefault()
+	self.hp = 100
+	self.maxSpeed = 400
+	self.acc = 500
+	self.braking = 5
+end
 
-
+function Player:getControlMode() return controlMode end
+function Player:setControlMode(mode) controlMode = mode end
 
 local function angleBetween(x1, y1, x2, y2)
 	return math.atan2((y2 - y1), (x2 - x1))
 end
 
 
-function Player:initialize(x, y)
-	Actor.initialize(self, x, y, maxSpeed, acc, braking)
+function Player:setDefaultShape(scene)
+	local x, y = self:getX(), self:getY()
+	self.shape = scene:circle(self:getX(), self:getY(), RADIUS)
+end
+
+
+function Player:initialize(scene, x, y)
+	Actor.initialize(self, scene, x, y)
 
 	firstLaserAngle = 0.01  -- that's weird but lasers are not rotating by keyboard if = 0
 	secondLaserAngle = firstLaserAngle - math.pi
 	controlMode = "mouse"
 	laserMode = "direct"
 
-	self.shape = shapes.newCircleShape(10, 15, 20)
 
 	bounds = {x = 0, y = 0, w = love.graphics.getWidth(), h = love.graphics.getHeight()}
 end
@@ -63,19 +72,19 @@ function clamp(low, n, high) return math.min(math.max(low, n), high) end
 
 
 function Player:handleWASD(dt)
-	vAcc:zero()
-	if lk.isDown("w") or lk.isDown("up") then vAcc:addY(-1) end
-	if lk.isDown("a") or lk.isDown("left") then vAcc:addX(-1) end
-	if lk.isDown("s") or lk.isDown("down") then vAcc:addY(1) end
-	if lk.isDown("d") or lk.isDown("right") then vAcc:addX(1) end
-	vAcc:normalize():scale(acc)
+	self.vAcc:zero()
+	if lk.isDown("w") or lk.isDown("up") then self.vAcc:addY(-1) end
+	if lk.isDown("a") or lk.isDown("left") then self.vAcc:addX(-1) end
+	if lk.isDown("s") or lk.isDown("down") then self.vAcc:addY(1) end
+	if lk.isDown("d") or lk.isDown("right") then self.vAcc:addX(1) end
+	self.vAcc:normalize():scale(self.acc)
 
 	if not (lk.isDown("w")  or lk.isDown("a")
 		or lk.isDown("s") or lk.isDown("d")
 		or lk.isDown("up")  or lk.isDown("left")
 		or lk.isDown("down") or lk.isDown("right")) then
-		vSpeed:scale(1 - braking * dt):round(1)
-	end
+		self.vSpeed:scale(1 - self.braking * dt):round(1)
+	end	
 end
 
 
@@ -105,44 +114,44 @@ function Player:updateLasers(dt)
 	local mX, mY = lm.getPosition()
 	local mouseAngle = firstLaserAngle
 
-	if (controlMode == "mouse") then
-		mouseAngle = angleBetween(pX, pY, mX, mY)
-	else
-		if (lk.isDown("q")) then mouseAngle = firstLaserAngle - KEYBOARD_ROTATE_maxSpeed * dt end
-		if (lk.isDown("e")) then mouseAngle = firstLaserAngle + KEYBOARD_ROTATE_maxSpeed * dt end
-	end
-
-	local dAngle
+	local dAngle = 0
 
 	if lk.isDown("1") then self:setLaserMode("direct") end
 	if lk.isDown("2") then self:setLaserMode("reverse") end
 	if lk.isDown("3") then self:setLaserMode("forced") end
 
-	if (math.abs(mouseAngle - firstLaserAngle) > 0.01) then -- for no dragging
-		if (sign(mouseAngle) ~= sign(firstLaserAngle)) then
-			sgn = sign(-math.tan(firstLaserAngle))
-			dAngle = sgn * LASER_SPEED * dt
-		elseif (mouseAngle > firstLaserAngle) then
-			dAngle = LASER_SPEED * dt
-		else
-			dAngle = -LASER_SPEED * dt
+	if (controlMode == "mouse") then
+		mouseAngle = angleBetween(pX, pY, mX, mY)
+		if (math.abs(mouseAngle - firstLaserAngle) > 0.01) then -- for no dragging
+			if (sign(mouseAngle) ~= sign(firstLaserAngle)) then
+				sgn = sign(-math.tan(firstLaserAngle))
+				dAngle = sgn * LASER_SPEED * dt
+			elseif (mouseAngle > firstLaserAngle) then
+				dAngle = LASER_SPEED * dt
+			else
+				dAngle = -LASER_SPEED * dt
+			end
 		end
-
-		firstLaserAngle = roundAngle(firstLaserAngle + dAngle)
-
-		local slm
-		if     (laserMode == "direrct") then slm = 1
-		elseif (laserMode == "reverse") then slm = -1
-		elseif (laserMode == "forced") then slm = 0
-		else slm = 1; end
-		secondLaserAngle = roundAngle(secondLaserAngle + slm * dAngle)
+	else
+		-- if (lk.isDown("q")) then mouseAngle = firstLaserAngle - LASER_SPEED * dt end
+		-- if (lk.isDown("e")) then mouseAngle = firstLaserAngle + LASER_SPEED * dt end
+		if (lk.isDown("q")) then dAngle = -LASER_SPEED * dt end
+		if (lk.isDown("e")) then dAngle = LASER_SPEED * dt end
 	end
+
+	local slm = 1
+	if     (laserMode == "direrct") then slm = 1
+	elseif (laserMode == "reverse") then slm = -1
+	elseif (laserMode == "forced") then slm = 0 end
+
+	firstLaserAngle = roundAngle(firstLaserAngle + dAngle)
+	secondLaserAngle = roundAngle(secondLaserAngle + slm * dAngle)
 end
 
 
-function Player:getLaser(number)
+function Player:getLaserLine(number)
 	local laser
-	local l = LASER_LENGTH
+	local l = Player.static.LASER_LENGTH
 	if number == 1 then laser = firstLaserAngle end
 	if number == 2 then laser = secondLaserAngle end
 	local xs, ys = self.vPos:getX(), self.vPos:getY()
@@ -151,14 +160,31 @@ function Player:getLaser(number)
 	return {xs = xs, ys = ys, xe = xe, ye = ye}
 end
 
+function Player:getLaser(number)
+	local tmp = self:getLaserLine(number)
+	local xs, ys, xe, ye = tmp.xs, tmp.ys, tmp.xe, tmp.ye
+	local d = Player.static.LASER_LENGTH
+	local a
+	if number == 1 then a = firstLaserAngle
+	else a = secondLaserAngle
+	end
+	local w = Player.static.LASER_WIDTH
+
+	local sh = shapes.newRectangleShape(xs, ys - w/2, d, w)
+	sh:rotate(a, xs, ys)
+	return sh
+end
+
 
 function Player:drawLaser(number, color)
 	color = color or {0, 0, 0}
-	laser = self:getLaser(number)
-	local xStart, yStart = laser.xs, laser.ys
-	local xEnd, yEnd = laser.xe, laser.ye
 	lg.setColor(color[1], color[2], color[3])
-	lg.line(xStart, yStart, xEnd, yEnd)
+	-- laser = self:getLaserLine(number)
+	-- local xStart, yStart = laser.xs, laser.ys
+	-- local xEnd, yEnd = laser.xe, laser.ye
+	-- lg.line(xStart, yStart, xEnd, yEnd)
+	self:getLaser(number):draw("line")
+
 end
 
 
@@ -168,8 +194,8 @@ function Player:update(dt)
 	self:updateLasers(dt)
 
 	if not pointInBounds(self.vPos:getX(), self.vPos:getY(), bounds) then
-		self.vPos:add(-vSpeed:getX(), -vSpeed:getY(), dt)
-		vSpeed:zero()
+		self.vPos:add(-self.vSpeed:getX(), -self.vSpeed:getY(), dt)
+		self.vSpeed:zero()
 	end
 end
 

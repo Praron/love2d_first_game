@@ -72,6 +72,23 @@ function HC:register(shape)
 
 	return shape
 end
+function HC:registerActor(actor)
+	shape = actor:getShape()
+	self.hash:register(actor, actor:bbox())
+
+	-- keep track of where/how big the shape is
+	for _, f in ipairs({'move', 'rotate', 'scale'}) do
+		local old_function = shape[f]
+		shape[f] = function(this, ...)
+			local x1,y1,x2,y2 = this:bbox()
+			old_function(this, ...)
+			self.hash:update(this, x1,y1,x2,y2, this:bbox())
+			return this
+		end
+	end
+
+	return shape
+end
 
 function HC:remove(shape)
 	self.hash:remove(shape, shape:bbox())

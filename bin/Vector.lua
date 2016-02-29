@@ -62,6 +62,13 @@ function Vector:zero()
 end
 
 
+function Vector:dist2To(vector)
+	local x1, y1 = self:get()
+	local x2, y2 = vector:get()
+	return ((x1 - x2)^2 + (y1 - y2)^2)
+end
+
+
 function Vector:scale(scalar)
 	return self:set(self.x * scalar, self.y * scalar)
 end
