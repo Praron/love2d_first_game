@@ -43,9 +43,10 @@ function Actor:initialize(scene, x, y)
 end
 
 
-function Actor:hit(damage)
+function Actor:hit(damage, x, y)
 	self.hp = self.hp - damage
 	if (self.hp <= 0) then self:die() end
+	self.hitX, self.hitY = x, y
 end
 
 
@@ -75,4 +76,13 @@ end
 function Actor:update(dt)
 	self:posUpdate(dt)
 	self.shape:moveTo(self.vPos:get())
+end
+
+
+function Actor:draw(dt)
+	if (self.hitX) then
+		lg.setColor(255, 100, 100)
+		lg.circle("line", self.hitX, self.hitY, 10)
+		self.hitX, self.hitY = nil, nil
+	end
 end

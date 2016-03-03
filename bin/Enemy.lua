@@ -13,4 +13,5 @@ local lg = love.graphics
 
 function Enemy:setTarget(vTarget)
 	self.vTarget = vTarget
+	return self
 end

@@ -12,7 +12,7 @@ local lg = love.graphics
 
 local RADIUS = 20
 
-local LASER_SPEED = 2
+local LASER_SPEED = 2.5
 Player.static.LASER_LENGTH = 1000
 Player.static.LASER_WIDTH = 20
 
@@ -98,6 +98,13 @@ local function roundAngle(x)
 		x = x - sign(x) * 2 * math.pi
 	end
 	return x
+end
+
+
+function Player:hit(damage)
+	-- Actor.hit(self, damage)
+	self.hp = self.hp - damage
+	print("Player hitted " .. damage .. "(" .. self.hp .. ")")
 end
 
 
