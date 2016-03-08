@@ -79,10 +79,10 @@ function Actor:update(dt)
 end
 
 
-function Actor:draw(dt)
+function Actor:draw()
 	if (self.hitX) then
-		lg.setColor(255, 100, 100)
-		lg.circle("line", self.hitX, self.hitY, 10)
+		lg.setColor(255, 0, 0)
+		lg.circle("fill", self.hitX, self.hitY, 10)
 		self.hitX, self.hitY = nil, nil
 	end
 end

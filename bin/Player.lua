@@ -12,7 +12,7 @@ local lg = love.graphics
 
 local RADIUS = 20
 
-local LASER_SPEED = 2.5
+local LASER_SPEED = 3
 Player.static.LASER_LENGTH = 1000
 Player.static.LASER_WIDTH = 20
 
@@ -53,8 +53,8 @@ function Player:initialize(scene, x, y)
 	controlMode = "mouse"
 	laserMode = "direct"
 
-
 	bounds = {x = 0, y = 0, w = love.graphics.getWidth(), h = love.graphics.getHeight()}
+
 end
 
 
@@ -156,6 +156,12 @@ function Player:updateLasers(dt)
 end
 
 
+function Player:getLaserAngle(number)
+	if number == 1 then return firstLaserAngle end
+	if number == 2 then return secondLaserAngle end
+end
+
+
 function Player:getLaserLine(number)
 	local laser
 	local l = Player.static.LASER_LENGTH
@@ -167,15 +173,29 @@ function Player:getLaserLine(number)
 	return {xs = xs, ys = ys, xe = xe, ye = ye}
 end
 
-function Player:getLaser(number)
+
+function Player:setLaserLength(number, xe, ye)
+	local x, y = self.vPos:get()
+	local l = ((x - xe)^2 + (y - ye)^2)^0.5
+	self.laserL = self.laserL or {}
+	self.laserL[number] = l
+end
+
+
+function Player:getLaser(number, forDraw)
 	local tmp = self:getLaserLine(number)
 	local xs, ys, xe, ye = tmp.xs, tmp.ys, tmp.xe, tmp.ye
-	local d = Player.static.LASER_LENGTH
 	local a
 	if number == 1 then a = firstLaserAngle
 	else a = secondLaserAngle
 	end
 	local w = Player.static.LASER_WIDTH
+	local d = Player.static.LASER_LENGTH
+
+	if forDraw then
+		d = self.laserL and self.laserL[number] or Player.static.LASER_LENGTH
+		if self.laserL then self.laserL[number] = nil end
+	end
 
 	local sh = shapes.newRectangleShape(xs, ys - w/2, d, w)
 	sh:rotate(a, xs, ys)
@@ -190,8 +210,7 @@ function Player:drawLaser(number, color)
 	-- local xStart, yStart = laser.xs, laser.ys
 	-- local xEnd, yEnd = laser.xe, laser.ye
 	-- lg.line(xStart, yStart, xEnd, yEnd)
-	self:getLaser(number):draw("line")
-
+	self:getLaser(number, true):draw("fill")
 end
 
 
@@ -218,6 +237,9 @@ function Player:draw()
 	lg.circle("fill", self:getX(), self:getY(), 10)
 	lg.setColor(255, 50, 150)
 	lg.circle("fill", self:getX(), self:getY(), 5)
+
+	-- self:drawLaser(1, {255, 0, 0})
+	-- self:drawLaser(2, {200, 200, 255})
 
 	self:drawLaser(1, {255, 0, 0})
 	self:drawLaser(2, {200, 200, 255})
