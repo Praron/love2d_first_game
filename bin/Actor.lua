@@ -2,6 +2,7 @@
 -- local class = require("libs.middleclass")
 local shapes = require("libs.hc.shapes")
 
+
 local lk = love.keyboard
 local lm = love.mouse
 local lg = love.graphics
@@ -16,17 +17,22 @@ function Actor:getShape() return self.shape end
 function Actor:setDefaultShape() self.shape = nil end -- use only in initialization
 function Actor:getHP() return hp end
 
-
 function Actor:getX() return self.vPos:getX() end
 function Actor:getY() return self.vPos:getY() end
 function Actor:bbox() return self:getShape():bbox() end
 
 
+Actor.default = {
+	hp = 1,
+	maxSpeed = 0,
+	acc = 0,
+	braking = 0,
+}
+
 function Actor:initDefault()
-	self.hp = 1
-	self.maxSpeed = 0
-	self.acc = 0
-	self.braking = 0
+	for k, v in pairs(self.default) do
+		self[k] = v
+	end
 end
 
 
@@ -52,7 +58,15 @@ end
 
 function Actor:die()
 	-- print(tostring(self) .. " on " .. self:getX(), self:getY() .. " died")
+	drawer:shake(0.3)
+	game:addSlowTime(0.1)
 	self.died = true
+
+	local sound = sfxr.newSound()
+	sound:randomExplosion()
+    local sounddata = sound:generateSoundData()
+    local source = love.audio.newSource(sounddata)
+    source:play()
 end
 
 

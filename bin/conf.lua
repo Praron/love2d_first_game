@@ -6,6 +6,7 @@ function love.conf(t)
     t.console = false
 
     t.window.icon = nil
+    t.window.borderless = false
     t.window.minwidth = 512
     t.window.minheight = 512 
     t.window.resizable = false

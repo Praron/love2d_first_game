@@ -8,14 +8,14 @@ HiveChild = class("HiveChild", Enemy)
 local lk = love.keyboard
 local lm = love.mouse
 local lg = love.graphics
-local SIZE = 10
+local SIZE = 15
 
 
-function HiveChild:initDefault()
-	self.hp = 0.05
-	self.maxSpeed = 150
-	self.acc = 700
-end
+HiveChild.default = {
+	hp = 0.05,
+	maxSpeed = 150,
+	acc = 700,
+}
 
 
 function HiveChild:setDefaultShape(scene)

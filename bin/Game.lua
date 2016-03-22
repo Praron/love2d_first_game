@@ -11,9 +11,12 @@ local player
 local spawner
 local scene
 
-function Game:initialize()
+function Game:initialize(settings)
+	self.settings = settings or Settings:new()
 	self:gotoState("Play")
 end
+
+function Game:getScene() return scene end
 
 
 function play:enteredState()
@@ -23,8 +26,14 @@ function play:enteredState()
 
 	local px, py = player.vPos:get()
 
-	spawner:circle(HiveChild, px, py, 350, 0.5, 3)
-	spawner:circle(FatQueen, px, py, 300, 0, 6)
+	spawner:circle(Scout, px, py, 450, 0, 10)
+	spawner:circle(HiveChild, px, py, 400, 0.5, 6)
+	spawner:circle(FatQueen, px, py, 350, 0, 3)
+
+	self.MAX_SLOW_TIME = 2
+	self.SLOW_TIME_POWER = 2
+	self.slowTime = self.MAX_SLOW_TIME
+
 end
 
 
@@ -32,10 +41,24 @@ function restart:enteredState() -- maybe this causes memory leak, I don't know
 	self:gotoState("Play")
 end
 
+function play:slowMotion(dt)
+	if self.slowTime > 0 then
+		self.slowTime = self.slowTime - dt
+		return dt/self.SLOW_TIME_POWER
+	else return dt end
+end
+
+function play:addSlowTime(time)
+	self.slowTime = self.slowTime + time
+	if self.slowTime > self.MAX_SLOW_TIME then
+		self.slowTime = self.MAX_SLOW_TIME end
+end
+
 
 function play:update(dt)
-	-- if isPaused then dt = 0 end
+	if lk.isDown("space") then dt = self:slowMotion(dt) end
 
+	Timer.update(dt)
 	scene:update(dt)
 
 	for laser = 1, 2 do
@@ -67,62 +90,17 @@ function play:update(dt)
 	end
 end
 
-
 function pause:update(dt)
 end
 
-
-local function drawBackground()
-	lg.setBackgroundColor(0, 100, 100)
-	lg.setColor(0, 72, 72)
-	local n = 12
-	local w = W/n
-	local h = H/n
-	for x = 0, n do
-		for y = 0, n do
-			-- mr = math.random
-			-- lg.setColor(mr(100), 72, 72)
-			-- lg.rectangle("fill", x * w + mr(3), y * h + mr(3), w - mr(6), h - mr(6))
-			lg.rectangle("fill", x * w + 3, y * h + 3, w - 6, h - 6)
-		end
-	end
-end
-
-
-local chroma = shine.separate_chroma()
-chroma.radius = 3
-chroma.angle = math.pi/4
-
-
-function play:draw()
-	chroma:draw(function()
-		drawBackground()
-		lg.setColor(255, 255, 255)
-		scene:getCollider().hash:draw("line", false, false)
-		scene:draw()
-
-		local dcolor = 75
-		lg.setColor(dcolor, dcolor, dcolor)
-		lg.setBlendMode("subtract")
-		for i = 0, W, 3 do
-			lg.line(i, 0, i, H)
-		end
-		for i = 0, H, 3 do
-		lg.line(0, i, W, i)
-		end
-		lg.setBlendMode("alpha")
-	end)
-end
-
-
-function play:restart()
+function play:restart(isPaused)
 	self:gotoState("Restart")
+	if isPaused then self:pushState("Pause") end
 end
-
 
 function play:keypressed(key)
 	if key == "p" then self:pushState("Pause") end
-	if key == "r" then self:restart() end
+	if key == "r" then self:restart(false) end
 	if key == "escape" then love.event.quit() end
 	if key == "tab" then
 		if player:getControlMode() == "mouse" then player:setControlMode("keyboard")
@@ -130,10 +108,9 @@ function play:keypressed(key)
 	end
 end
 
-
 function pause:keypressed(key)
 	if key == "p" then self:popState() end
-	if key == "r" then self:restart() end
+	if key == "r" then self:restart(true) end
 	if key == "escape" then love.event.quit() end
 	if key == "tab" then
 		if player:getControlMode() == "mouse" then player:setControlMode("keyboard")

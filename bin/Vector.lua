@@ -7,6 +7,10 @@ function Vector:initialize(x, y)
 	self.y = y or 0
 end
 
+function Vector:copy()
+	return Vector:new(self.x, self.y)
+end
+
 function Vector:addX(x, dt)
 	delta = dt or 1
 	self.x = self.x + x * (dt or 1)
@@ -69,6 +73,11 @@ function Vector:dist2To(vector)
 end
 
 
+function Vector:distTo(vector)
+	return math.sqrt(self:dist2To(vector))
+end
+
+
 function Vector:scale(scalar)
 	return self:set(self.x * scalar, self.y * scalar)
 end
@@ -90,6 +99,17 @@ function Vector:normalize()
 	local l = len == 0 and 1 or len
 	
 	self:set(self.x / l, self.y / l)
+	return self
+end
+
+
+function Vector:rotate(angle)
+	local cos = math.cos(angle);
+	local sin = math.sin(angle);
+
+	local newX = self.x * cos - self.y * sin;
+	local newY = self.x * sin + self.y * cos;
+	self:set(newX, newY)
 	return self
 end
 

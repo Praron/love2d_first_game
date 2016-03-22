@@ -7,11 +7,11 @@ local lg = love.graphics
 local RADIUS = 15
 
 
-function FatQueen:initDefault()
-	self.hp = 1
-	self.maxSpeed = 80
-	self.acc = 1000
-end
+FatQueen.default = {
+	hp = 1,
+	maxSpeed = 80,
+	acc = 1000,
+}
 
 function FatQueen:setDefaultShape(scene)
 	local x, y = self:getX(), self:getY()

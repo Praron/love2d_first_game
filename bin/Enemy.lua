@@ -23,7 +23,7 @@ end
 
 
 function Enemy:posUpdate(dt)
-	self:getShape():rotate(3 * dt)
+	-- self:getShape():rotate(3 * dt)
 
 	angle = angleBetween(self:getX(), self:getY(), self.vTarget:getX(), self.vTarget:getY())
 	self.vAcc:set(self.acc * math.cos(angle), self.acc * math.sin(angle))

@@ -1,6 +1,8 @@
 -- require("Vector")
 -- require("Actor")
 -- local class = require("libs.middleclass")
+
+
 local shapes = require("libs.hc.shapes")
 
 Player = class("Player", Actor)
@@ -24,12 +26,12 @@ local laserMode
 
 local controlMode
 
-function Player:initDefault()
-	self.hp = 100
-	self.maxSpeed = 400
-	self.acc = 500
-	self.braking = 5
-end
+Player.default = {
+	hp = 100,
+	maxSpeed = 400,
+	acc = 500,
+	braking = 4,
+}
 
 function Player:getControlMode() return controlMode end
 function Player:setControlMode(mode) controlMode = mode end
@@ -50,6 +52,7 @@ function Player:initialize(scene, x, y)
 
 	firstLaserAngle = 0.01  -- that's weird but lasers are not rotating by keyboard if = 0
 	secondLaserAngle = firstLaserAngle - math.pi
+	-- controlMode = "keyboard"
 	controlMode = "mouse"
 	laserMode = "direct"
 
@@ -123,9 +126,9 @@ function Player:updateLasers(dt)
 
 	local dAngle = 0
 
-	if lk.isDown("1") then self:setLaserMode("direct") end
-	if lk.isDown("2") then self:setLaserMode("reverse") end
-	if lk.isDown("3") then self:setLaserMode("forced") end
+	if lk.isDown("1", "u") then self:setLaserMode("direct") end
+	if lk.isDown("2", "i") then self:setLaserMode("reverse") end
+	if lk.isDown("3", "o") then self:setLaserMode("forced") end
 
 	if (controlMode == "mouse") then
 		mouseAngle = angleBetween(pX, pY, mX, mY)
@@ -142,8 +145,8 @@ function Player:updateLasers(dt)
 	else
 		-- if (lk.isDown("q")) then mouseAngle = firstLaserAngle - LASER_SPEED * dt end
 		-- if (lk.isDown("e")) then mouseAngle = firstLaserAngle + LASER_SPEED * dt end
-		if (lk.isDown("q")) then dAngle = -LASER_SPEED * dt end
-		if (lk.isDown("e")) then dAngle = LASER_SPEED * dt end
+		if (lk.isDown("q", "k")) then dAngle = -LASER_SPEED * dt end
+		if (lk.isDown("e", "l")) then dAngle = LASER_SPEED * dt end
 	end
 
 	local slm = 1

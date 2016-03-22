@@ -14,6 +14,7 @@ end
 
 function Scene:getCollider() return self.collider end
 
+function Scene:polygon(...) return self.collider:polygon(...) end
 function Scene:rectangle(...) return self.collider:rectangle(...) end
 function Scene:circle(...) return self.collider:circle(...) end
 function Scene:collisions(...) return self.collider:collisions(...) end
